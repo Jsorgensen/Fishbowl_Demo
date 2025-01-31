@@ -53,6 +53,8 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation(libs.dagger.hilt.android)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
     kapt(libs.dagger.hilt.compiler)
 
     implementation(libs.datastore.preferences)
