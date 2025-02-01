@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -22,9 +23,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fishbowl_demo.R
 import com.example.fishbowl_demo.data.model.Joke
+import com.example.fishbowl_demo.data.model.JokeCategory
 import com.example.fishbowl_demo.ui.components.FavoriteButton
+import com.example.fishbowl_demo.ui.components.JokeCategory
 import com.example.fishbowl_demo.ui.theme.roboRegular
 import com.example.fishbowl_demo.viewmodel.JokeViewModel
+import kotlinx.coroutines.flow.flowOf
 
 
 @Composable
@@ -36,47 +40,64 @@ fun JokeScreen(
     viewModel.navController = navController
     viewModel.setJoke(jokeId)
 
-    JokeState(viewModel)
+    JokeState(
+        jokeState = viewModel.jokeFlow.collectAsState(),
+        onFavoriteAction = { viewModel.onFavoriteAction() },
+    )
 }
 
 @Preview
 @Composable
 fun JokeScreenPreview() {
+    val state = flowOf<Joke>().collectAsState(Joke.example)
     MaterialTheme {
         Surface {
-            JokeBody(Joke.example)
+            JokeState(
+                state,
+                {},
+            )
         }
     }
 }
 
 @Composable
 fun JokeState(
-    viewModel: JokeViewModel,
+    jokeState: State<Joke>,
+    onFavoriteAction: () -> Unit,
 ) {
-    val jokeState = viewModel.jokeFlow.collectAsState()
+    val joke = jokeState.value
+    val jokeCategory = joke.category ?: JokeCategory.Undefined
     JokeBody(
-        joke = jokeState.value,
-        onFavoriteAction = { viewModel.onFavoriteAction() }
+        jokeText = joke.jokeText,
+        isFavorite = joke.isFavorite ?: false,
+        jokeCategory = jokeCategory,
+        onFavoriteAction = onFavoriteAction
     )
 }
 
 @Composable
 fun JokeBody(
-    joke: Joke,
+    jokeText: String,
+    isFavorite: Boolean,
+    jokeCategory: JokeCategory,
     onFavoriteAction: () -> Unit = {},
 ) {
-    Column {
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
         QuoteRow()
         Text(
-            modifier = Modifier.padding(16.dp),
-            text = joke.jokeText,
+            modifier = Modifier
+                .padding(top = 12.dp),
+            text = jokeText,
             style = TextStyle(
                 fontFamily = roboRegular,
                 fontSize = 30.sp,
             )
         )
         BottomRow(
-            isFavorite = joke.isFavorite ?: false,
+            jokeCategory = jokeCategory,
+            isFavorite = isFavorite,
             onFavoriteAction = onFavoriteAction,
         )
     }
@@ -86,13 +107,11 @@ fun JokeBody(
 fun QuoteRow() {
     Row {
         Image(
-            modifier = Modifier.padding(16.dp),
             painter = painterResource(R.drawable.format_quote_open),
             contentDescription = "opening quote"
         )
         Spacer(modifier = Modifier.weight(1f))
         Image(
-            modifier = Modifier.padding(16.dp),
             painter = painterResource(R.drawable.format_quote_close),
             contentDescription = "opening quote"
         )
@@ -101,14 +120,18 @@ fun QuoteRow() {
 
 @Composable
 fun BottomRow(
+    jokeCategory: JokeCategory,
     isFavorite: Boolean,
     onFavoriteAction: () -> Unit,
 ) {
-    Row {
+    Row(
+        modifier = Modifier
+            .padding(top = 12.dp),
+    ) {
+        JokeCategory(jokeCategory)
         Spacer(modifier = Modifier.weight(1f))
         Box(
             modifier = Modifier
-                .padding(16.dp)
                 .clickable { onFavoriteAction() }
         ) {
             FavoriteButton(
