@@ -57,6 +57,11 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     kapt(libs.dagger.hilt.compiler)
 
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
+    implementation(libs.room.paging)
+
     implementation(libs.datastore.preferences)
 
     implementation(libs.squareup.retrofit2)

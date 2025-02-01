@@ -1,4 +1,4 @@
-package com.example.fishbowl_demo.repositories
+package com.example.fishbowl_demo.data.repositories
 
 import android.util.Log
 import com.example.fishbowl_demo.data.model.Joke
@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class JokesRepository @Inject constructor(
@@ -28,6 +29,7 @@ class JokesRepository @Inject constructor(
 
     private suspend fun retrieveLocalStorageJokes() {
         val localJokes = localStorageRepository.jokesFlow
+            .map { it.map { joke -> joke.apply { isFavorite = true } } }
             .firstOrNull() ?: emptyList()
         _jokesFlow.emit(localJokes)
 
@@ -46,8 +48,6 @@ class JokesRepository @Inject constructor(
 
             _jokesFlow.emit(jokes)
 
-            localStorageRepository.setJokes(jokes)
-
             loadJokes()
         }
     }
@@ -56,6 +56,28 @@ class JokesRepository @Inject constructor(
         amount: Int,
     ): List<Joke> {
         return jokesService.getJokes(amount) ?: emptyList()
+    }
+
+    suspend fun favoriteJoke(joke: Joke) {
+        if (joke.isFavorite == true) {
+            localStorageRepository.removeJoke(joke)
+        } else {
+            localStorageRepository.addJoke(joke)
+        }
+
+        val jokes = _jokesFlow.value
+            .toMutableList()
+            .apply {
+                val index = indexOfFirst { it.id == joke.id }
+                val existing = when {
+                    index == -1 -> null
+                    else -> get(index)
+                }
+                remove(existing)
+                val updated = existing?.copy(isFavorite = !(joke.isFavorite ?: false))
+                if (updated != null) add(index, updated)
+            }.toList()
+        _jokesFlow.emit(jokes)
     }
 
     companion object {

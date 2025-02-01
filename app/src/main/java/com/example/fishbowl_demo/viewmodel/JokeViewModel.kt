@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.fishbowl_demo.data.model.Joke
-import com.example.fishbowl_demo.repositories.JokesRepository
+import com.example.fishbowl_demo.data.repositories.JokesRepository
 import com.example.fishbowl_demo.util.launchDefault
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
