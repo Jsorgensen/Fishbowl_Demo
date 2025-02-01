@@ -9,7 +9,6 @@ import com.example.fishbowl_demo.util.launchDefault
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,9 +24,16 @@ class JokeViewModel @Inject constructor(
 
     fun setJoke(jokeId: Int?) {
         viewModelScope.launchDefault {
-            val joke = jokesRepository.jokesFlow.first().find { it.id == jokeId }
+            val joke = jokesRepository.getJoke(jokeId)
             _jokeFlow.emit(joke ?: Joke.failedToLoad)
         }
     }
 
+    fun onFavoriteAction() {
+        viewModelScope.launchDefault {
+            val joke = _jokeFlow.value
+            jokesRepository.favoriteJoke(joke)
+            setJoke(joke.id)
+        }
+    }
 }
