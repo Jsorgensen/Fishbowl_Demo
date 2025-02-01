@@ -2,18 +2,37 @@ package com.example.fishbowl_demo.data.model
 
 data class Joke(
     val error: Boolean? = null,
-    val category: String?,
-    val type: String?,
+    val category: String? = null,
+    val type: String? = null,
     val joke: String? = null,
     val setup: String? = null,
     val delivery: String? = null,
-    val flags: Flags?,
-    val id: Int?,
-    val safe: Boolean?,
-    val lang: String?,
+    val flags: Flags? = null,
+    val id: Int? = null,
+    val safe: Boolean? = null,
+    val lang: String? = null,
 ) {
 
+    val jokeText: String
+        get() = when {
+            joke != null -> "$joke"
+            setup != null -> "${setup}\n\n${delivery}"
+            else -> "Error getting joke"
+        }
+
     companion object {
+
+        val loading: Joke by lazy {
+            Joke(
+                joke = "Loading...",
+            )
+        }
+
+        val failedToLoad: Joke by lazy {
+            Joke(
+                joke = "Failed to Load",
+            )
+        }
 
         val example: Joke by lazy {
             Joke(

@@ -12,3 +12,9 @@ fun CoroutineScope.launchIO(block: suspend CoroutineScope.() -> Unit) {
         block()
     }
 }
+
+fun CoroutineScope.launchDefault(block: suspend CoroutineScope.() -> Unit) {
+    launch(Dispatchers.Default) {
+        block()
+    }
+}
