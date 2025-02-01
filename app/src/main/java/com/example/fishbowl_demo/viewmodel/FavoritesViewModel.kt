@@ -8,26 +8,19 @@ import com.example.fishbowl_demo.data.model.Screen
 import com.example.fishbowl_demo.data.repositories.JokesRepository
 import com.example.fishbowl_demo.util.launchIO
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
-class JokesViewModel @Inject constructor(
+class FavoritesViewModel @Inject constructor(
     private val jokesRepository: JokesRepository,
 ): ViewModel() {
 
     val jokesFlow by lazy {
-        jokesRepository.jokesFlow
+        jokesRepository.favoritesFlow
     }
 
     var navController: NavController? = null
 
-
-    init {
-        viewModelScope.launchIO {
-            jokesRepository.requestBatchOfJokes()
-        }
-    }
 
     fun onJokeSelected(joke: Joke) {
         navController?.navigate("joke/${joke.id}")
@@ -39,13 +32,7 @@ class JokesViewModel @Inject constructor(
         }
     }
 
-    fun navigateToFavorites() {
-        navController?.navigate(Screen.Favorites.route)
-    }
-
-    fun requestBatchOfJokes() {
-        viewModelScope.launchIO {
-            jokesRepository.requestBatchOfJokes()
-        }
+    fun onBackClicked() {
+        navController?.popBackStack()
     }
 }

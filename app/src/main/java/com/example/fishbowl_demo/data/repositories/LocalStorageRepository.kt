@@ -19,6 +19,7 @@ class LocalStorageRepository @Inject constructor(
             entities.map { entity ->
                 val json = entity.json
                 gson.fromJson(json, Joke::class.java)
+                    .apply { isFavorite = true }
             }
         }
 
