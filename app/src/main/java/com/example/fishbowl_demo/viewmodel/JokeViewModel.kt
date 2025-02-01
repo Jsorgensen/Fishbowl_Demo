@@ -1,5 +1,6 @@
 package com.example.fishbowl_demo.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -35,5 +36,10 @@ class JokeViewModel @Inject constructor(
             jokesRepository.favoriteJoke(joke)
             setJoke(joke.id)
         }
+    }
+
+    fun onBackClicked() {
+        navController?.popBackStack()
+            ?: Log.w("JokeViewModel", "onBackClicked) no navController")
     }
 }
