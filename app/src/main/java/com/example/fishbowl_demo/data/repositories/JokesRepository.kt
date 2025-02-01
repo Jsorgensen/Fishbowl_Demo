@@ -20,6 +20,8 @@ class JokesRepository @Inject constructor(
     private val _jokesFlow = MutableStateFlow<List<Joke>>(emptyList())
     val jokesFlow: Flow<List<Joke>> = _jokesFlow.asStateFlow()
 
+    private var currentPage = 0
+
 
     init {
         coroutineScope.launchIO {
@@ -33,14 +35,15 @@ class JokesRepository @Inject constructor(
             .firstOrNull() ?: emptyList()
         _jokesFlow.emit(localJokes)
 
-        loadJokes()
+        requestBatchOfJokes()
     }
 
-    private suspend fun loadJokes() {
-        if (_jokesFlow.value.size < JOKES_PER_PAGE) {
-            val amountOfJokesToRequest = JOKES_PER_PAGE - _jokesFlow.value.size
+    suspend fun requestBatchOfJokes(page: Int = ++currentPage) {
+        Log.d("JokesRepository", "requestBatchOfJokes) currentPage: $page")
+        val desiredJokeCount = page * JOKES_PER_PAGE
+        if (_jokesFlow.value.size < desiredJokeCount) {
+            val amountOfJokesToRequest = desiredJokeCount - _jokesFlow.value.size
             val newJokes = requestJokes(amountOfJokesToRequest)
-            Log.d("JokesRepository", "newJokes: $newJokes")
 
             val jokes = _jokesFlow.value
                 .toMutableList()
@@ -48,7 +51,7 @@ class JokesRepository @Inject constructor(
 
             _jokesFlow.emit(jokes)
 
-            loadJokes()
+            requestBatchOfJokes(page)
         }
     }
 

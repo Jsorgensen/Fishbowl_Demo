@@ -1,12 +1,10 @@
 package com.example.fishbowl_demo.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,6 +25,7 @@ import com.example.fishbowl_demo.data.model.JokeCategory
 import com.example.fishbowl_demo.ui.components.FavoriteButton
 import com.example.fishbowl_demo.ui.components.HeaderRow
 import com.example.fishbowl_demo.ui.components.JokeCategory
+import com.example.fishbowl_demo.ui.components.LazyColumnWithBottomReached
 import com.example.fishbowl_demo.ui.components.SwipeButton
 import com.example.fishbowl_demo.ui.components.SwipeRow
 import com.example.fishbowl_demo.ui.theme.roboRegular
@@ -49,7 +48,7 @@ fun JokesScreenPreview() {
         Surface {
             val exampleList = listOf(Joke.example)
             val jokes = flowOf(exampleList).collectAsState(exampleList)
-            JokesBody(jokes, {}, {})
+            JokesBody(jokes, {}, {}, {})
         }
     }
 }
@@ -61,8 +60,9 @@ fun JokesState(
     val jokesState = viewModel.jokesFlow.collectAsState(initial = emptyList())
     val onSelected: (Joke) -> Unit = { joke: Joke -> viewModel.onJokeSelected(joke) }
     val onFavorite: (Joke) -> Unit = { joke: Joke -> viewModel.onJokeFavoriteSelected(joke) }
+    val onBottomReached = { viewModel.requestBatchOfJokes() }
 
-    JokesBody(jokesState, onSelected, onFavorite)
+    JokesBody(jokesState, onSelected, onFavorite, onBottomReached)
 }
 
 @Composable
@@ -70,6 +70,7 @@ fun JokesBody(
     jokesState: State<List<Joke>>,
     onSelected: (Joke) -> Unit,
     onFavorite: (Joke) -> Unit,
+    onBottomReached: () -> Unit,
 ) {
     Scaffold(
         topBar = { HeaderRow(
@@ -79,7 +80,13 @@ fun JokesBody(
             }
         ) }
     ) { innerPadding ->
-        JokesList(Modifier.padding(innerPadding),jokesState, onSelected, onFavorite)
+        JokesList(
+            modifier = Modifier.padding(innerPadding),
+            jokesState = jokesState,
+            onSelected = onSelected,
+            onFavorite = onFavorite,
+            onBottomReached = onBottomReached,
+        )
     }
 }
 
@@ -87,13 +94,14 @@ fun JokesBody(
 fun JokesList(
     modifier: Modifier,
     jokesState: State<List<Joke>>,
-    onSelected: (Joke) -> Unit = {},
+    onSelected: (Joke) -> Unit,
     onFavorite: (Joke) -> Unit,
+    onBottomReached: () -> Unit,
 ) {
     val jokes = jokesState.value
-    Log.d("JokesScreen", "JokesList) favorites: ${jokes.joinToString(",\n\t") { "${it.jokeText.substring(0, 30)}: ${it.isFavorite}"} }")
-    LazyColumn(
-        modifier = modifier
+    LazyColumnWithBottomReached(
+        modifier = modifier,
+        onBottomReached = onBottomReached
     ) {
         items(jokes.size) { i ->
             val joke = jokes[i]

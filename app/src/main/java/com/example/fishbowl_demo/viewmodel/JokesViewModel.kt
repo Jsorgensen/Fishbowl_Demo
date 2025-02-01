@@ -31,4 +31,10 @@ class JokesViewModel @Inject constructor(
             jokesRepository.favoriteJoke(joke)
         }
     }
+
+    fun requestBatchOfJokes() {
+        viewModelScope.launchIO {
+            jokesRepository.requestBatchOfJokes()
+        }
+    }
 }
