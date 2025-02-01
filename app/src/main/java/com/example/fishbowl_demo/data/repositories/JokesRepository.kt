@@ -58,6 +58,10 @@ class JokesRepository @Inject constructor(
         return jokesService.getJokes(amount) ?: emptyList()
     }
 
+    fun getJoke(jokeId: Int?): Joke? {
+        return _jokesFlow.value.find { it.id == jokeId }
+    }
+
     suspend fun favoriteJoke(joke: Joke) {
         if (joke.isFavorite == true) {
             localStorageRepository.removeJoke(joke)
@@ -65,17 +69,16 @@ class JokesRepository @Inject constructor(
             localStorageRepository.addJoke(joke)
         }
 
+        val updatedJoke = joke.copy(isFavorite = !(joke.isFavorite ?: false))
+        updateJoke(updatedJoke)
+    }
+
+    private suspend fun updateJoke(joke: Joke) {
         val jokes = _jokesFlow.value
             .toMutableList()
             .apply {
                 val index = indexOfFirst { it.id == joke.id }
-                val existing = when {
-                    index == -1 -> null
-                    else -> get(index)
-                }
-                remove(existing)
-                val updated = existing?.copy(isFavorite = !(joke.isFavorite ?: false))
-                if (updated != null) add(index, updated)
+                if (index != -1) set(index, joke)
             }.toList()
         _jokesFlow.emit(jokes)
     }

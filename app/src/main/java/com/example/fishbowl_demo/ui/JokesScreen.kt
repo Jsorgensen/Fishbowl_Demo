@@ -15,12 +15,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.substring
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.fishbowl_demo.R
 import com.example.fishbowl_demo.data.model.Joke
+import com.example.fishbowl_demo.ui.components.FavoriteButton
+import com.example.fishbowl_demo.ui.components.SwipeButton
+import com.example.fishbowl_demo.ui.components.SwipeRow
 import com.example.fishbowl_demo.ui.theme.roboRegular
 import com.example.fishbowl_demo.viewmodel.JokesViewModel
 import kotlinx.coroutines.flow.flowOf
@@ -89,13 +91,17 @@ fun JokeItem(
     onSelected: (Joke) -> Unit = {},
     onFavorite: (Joke) -> Unit,
 ) {
-    SwipeableRow(
+    SwipeRow(
         modifier = Modifier
             .background(colorResource(R.color.red_500)),
         actions = {
-            FavoriteButton(
-                isFavorite = joke.isFavorite ?: false,
-            )
+            SwipeButton {
+                FavoriteButton(
+                    this,
+                    isFavorite = joke.isFavorite ?: false,
+                    tint = colorResource(R.color.white)
+                )
+            }
         },
         onAction = { onFavorite(joke) }
     ) {
@@ -109,24 +115,4 @@ fun JokeItem(
             )
         )
     }
-}
-
-@Composable
-fun FavoriteButton(
-    isFavorite: Boolean,
-) {
-    val drawableId = if (isFavorite) {
-        R.drawable.heart
-    } else {
-        R.drawable.heart_outline
-    }
-    val contentDescription = if (isFavorite) {
-        "favorite"
-    } else {
-        "not favorite"
-    }
-    SwipeableButton(
-        drawableId = drawableId,
-        contentDescription = contentDescription,
-    )
 }
