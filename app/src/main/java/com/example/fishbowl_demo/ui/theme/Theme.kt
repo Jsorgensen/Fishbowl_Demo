@@ -47,7 +47,7 @@ fun Fishbowl_DemoTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = RoboRegular,
+        typography = RoboRegular14,
         content = content
     )
 }

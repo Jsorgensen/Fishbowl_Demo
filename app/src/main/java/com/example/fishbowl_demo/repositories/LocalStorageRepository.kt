@@ -24,7 +24,9 @@ class LocalStorageRepository @Inject constructor(
 
     val jokesFlow: Flow<List<Joke>> = dataStore.data.map { preferences ->
         val json = preferences[JOKES_KEY]
-        gson.fromJson(json, Array<Joke>::class.java).toList()
+        json?.let {
+            gson.fromJson(json, Array<Joke>::class.java).toList()
+        } ?: emptyList()
     }
 
     suspend fun setJokes(jokes: List<Joke>) {

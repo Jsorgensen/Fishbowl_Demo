@@ -1,5 +1,6 @@
 package com.example.fishbowl_demo.repositories
 
+import android.util.Log
 import com.example.fishbowl_demo.data.model.Joke
 import com.example.fishbowl_demo.data.network.JokesService
 import com.example.fishbowl_demo.util.coroutineScope
@@ -20,13 +21,44 @@ class JokesRepository @Inject constructor(
 
 
     init {
-        retrieveLocalStorageJokes()
+        coroutineScope.launchIO {
+            retrieveLocalStorageJokes()
+        }
     }
 
-    private fun retrieveLocalStorageJokes() {
-        coroutineScope.launchIO {
-            val localJokes = localStorageRepository.jokesFlow.firstOrNull() ?: emptyList()
-            _jokesFlow.emit(localJokes)
+    private suspend fun retrieveLocalStorageJokes() {
+        val localJokes = localStorageRepository.jokesFlow
+            .firstOrNull() ?: emptyList()
+        _jokesFlow.emit(localJokes)
+
+        loadJokes()
+    }
+
+    private suspend fun loadJokes() {
+        if (_jokesFlow.value.size < JOKES_PER_PAGE) {
+            val amountOfJokesToRequest = JOKES_PER_PAGE - _jokesFlow.value.size
+            val newJokes = requestJokes(amountOfJokesToRequest)
+            Log.d("JokesRepository", "newJokes: $newJokes")
+
+            val jokes = _jokesFlow.value
+                .toMutableList()
+                .apply { addAll(newJokes) }
+
+            _jokesFlow.emit(jokes)
+
+            localStorageRepository.setJokes(jokes)
+
+            loadJokes()
         }
+    }
+
+    private suspend fun requestJokes(
+        amount: Int,
+    ): List<Joke> {
+        return jokesService.getJokes(amount) ?: emptyList()
+    }
+
+    companion object {
+        private const val JOKES_PER_PAGE = 25
     }
 }
