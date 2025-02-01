@@ -11,6 +11,7 @@ data class Joke(
     val id: Int? = null,
     val safe: Boolean? = null,
     val lang: String? = null,
+    var isFavorite: Boolean? = false,
 ) {
 
     val jokeText: String

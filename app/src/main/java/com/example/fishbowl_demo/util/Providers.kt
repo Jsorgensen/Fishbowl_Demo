@@ -1,11 +1,12 @@
 package com.example.fishbowl_demo.util
 
 import android.content.Context
+import androidx.room.Room
+import com.example.fishbowl_demo.data.database.JokesDatabase
 import com.example.fishbowl_demo.data.network.JokesApi
 import com.example.fishbowl_demo.data.network.JokesService
-import com.example.fishbowl_demo.repositories.JokesRepository
-import com.example.fishbowl_demo.repositories.LocalStorageRepository
-import com.example.fishbowl_demo.repositories.dataStore
+import com.example.fishbowl_demo.data.repositories.JokesRepository
+import com.example.fishbowl_demo.data.repositories.LocalStorageRepository
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -40,11 +41,25 @@ class ProvidersModule {
 
     @Provides
     @Singleton
+    fun providesJokesDatabase(
+        @ApplicationContext context: Context,
+    ): JokesDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext,
+            JokesDatabase::class.java,
+            "joke_database"
+        )
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    @Singleton
     fun providesLocalStorageRepository(
         @ApplicationContext context: Context,
     ): LocalStorageRepository {
         return LocalStorageRepository(
-            dataStore = context.dataStore,
+            database = providesJokesDatabase(context),
             gson = providesGson(),
         )
     }
