@@ -20,23 +20,12 @@ class JokesRepository @Inject constructor(
     private val _jokesFlow = MutableStateFlow<List<Joke>>(emptyList())
     val jokesFlow: Flow<List<Joke>> = _jokesFlow.asStateFlow()
 
+    val favoritesFlow by lazy {
+        localStorageRepository.jokesFlow
+    }
+
     private var currentPage = 0
 
-
-    init {
-        coroutineScope.launchIO {
-            retrieveLocalStorageJokes()
-        }
-    }
-
-    private suspend fun retrieveLocalStorageJokes() {
-        val localJokes = localStorageRepository.jokesFlow
-            .map { it.map { joke -> joke.apply { isFavorite = true } } }
-            .firstOrNull() ?: emptyList()
-        _jokesFlow.emit(localJokes)
-
-        requestBatchOfJokes()
-    }
 
     suspend fun requestBatchOfJokes(page: Int = ++currentPage) {
         Log.d("JokesRepository", "requestBatchOfJokes) currentPage: $page")

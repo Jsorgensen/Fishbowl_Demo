@@ -1,6 +1,5 @@
 package com.example.fishbowl_demo.ui.components
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -10,12 +9,11 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun LazyColumnWithBottomReached(
     modifier: Modifier,
-    onBottomReached: () -> Unit,
+    onBottomReached: (() -> Unit)? = null,
     content: LazyListScope.() -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -36,7 +34,7 @@ fun LazyColumnWithBottomReached(
 
     LaunchedEffect(isAtBottom) {
         if (isAtBottom) {
-            onBottomReached()
+            onBottomReached?.invoke()
         }
     }
 

@@ -18,10 +18,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.fishbowl_demo.data.model.Screen
+import com.example.fishbowl_demo.ui.FavoritesScreen
 import com.example.fishbowl_demo.ui.JokeScreen
 import com.example.fishbowl_demo.ui.JokesScreen
 import com.example.fishbowl_demo.ui.theme.Fishbowl_DemoTheme
 import com.example.fishbowl_demo.util.JOKE_ID_KEY
+import com.example.fishbowl_demo.viewmodel.FavoritesViewModel
 import com.example.fishbowl_demo.viewmodel.JokeViewModel
 import com.example.fishbowl_demo.viewmodel.JokesViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -80,6 +82,13 @@ class MainActivity @Inject constructor() : ComponentActivity() {
                     jokeId,
                     viewModel,
                     navController,
+                )
+            }
+            composable(Screen.Favorites.route) {
+                val viewModel:FavoritesViewModel by viewModels()
+                FavoritesScreen(
+                    viewModel,
+                    navController
                 )
             }
         }
