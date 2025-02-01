@@ -42,7 +42,9 @@ class MainActivity @Inject constructor() : ComponentActivity() {
             mNavController = rememberNavController()
 
             Fishbowl_DemoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                ) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
                         AppNavHost(navController = navController)
                     }

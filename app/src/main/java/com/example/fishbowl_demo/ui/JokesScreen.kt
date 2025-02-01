@@ -9,13 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +25,7 @@ import com.example.fishbowl_demo.R
 import com.example.fishbowl_demo.data.model.Joke
 import com.example.fishbowl_demo.data.model.JokeCategory
 import com.example.fishbowl_demo.ui.components.FavoriteButton
+import com.example.fishbowl_demo.ui.components.HeaderRow
 import com.example.fishbowl_demo.ui.components.JokeCategory
 import com.example.fishbowl_demo.ui.components.SwipeButton
 import com.example.fishbowl_demo.ui.components.SwipeRow
@@ -70,22 +71,34 @@ fun JokesBody(
     onSelected: (Joke) -> Unit,
     onFavorite: (Joke) -> Unit,
 ) {
-    JokesList(jokesState, onSelected, onFavorite)
+    Scaffold(
+        topBar = { HeaderRow(
+            titleStringId = R.string.jokes,
+            actions = {
+                //TODO
+            }
+        ) }
+    ) { innerPadding ->
+        JokesList(Modifier.padding(innerPadding),jokesState, onSelected, onFavorite)
+    }
 }
 
 @Composable
 fun JokesList(
+    modifier: Modifier,
     jokesState: State<List<Joke>>,
     onSelected: (Joke) -> Unit = {},
     onFavorite: (Joke) -> Unit,
 ) {
     val jokes = jokesState.value
     Log.d("JokesScreen", "JokesList) favorites: ${jokes.joinToString(",\n\t") { "${it.jokeText.substring(0, 30)}: ${it.isFavorite}"} }")
-    LazyColumn {
+    LazyColumn(
+        modifier = modifier
+    ) {
         items(jokes.size) { i ->
             val joke = jokes[i]
             JokeItem(joke, onSelected, onFavorite)
-            HorizontalDivider()
+            HorizontalDivider(modifier = Modifier.padding(start = 12.dp))
         }
     }
 }

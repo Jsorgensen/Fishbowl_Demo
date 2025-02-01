@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import com.example.fishbowl_demo.R
 import com.example.fishbowl_demo.data.model.Joke
 import com.example.fishbowl_demo.data.model.JokeCategory
 import com.example.fishbowl_demo.ui.components.FavoriteButton
+import com.example.fishbowl_demo.ui.components.HeaderRow
 import com.example.fishbowl_demo.ui.components.JokeCategory
 import com.example.fishbowl_demo.ui.theme.roboRegular
 import com.example.fishbowl_demo.viewmodel.JokeViewModel
@@ -43,6 +45,7 @@ fun JokeScreen(
     JokeState(
         jokeState = viewModel.jokeFlow.collectAsState(),
         onFavoriteAction = { viewModel.onFavoriteAction() },
+        onBackClicked = { viewModel.onBackClicked() },
     )
 }
 
@@ -55,6 +58,7 @@ fun JokeScreenPreview() {
             JokeState(
                 state,
                 {},
+                {},
             )
         }
     }
@@ -64,6 +68,7 @@ fun JokeScreenPreview() {
 fun JokeState(
     jokeState: State<Joke>,
     onFavoriteAction: () -> Unit,
+    onBackClicked: () -> Unit,
 ) {
     val joke = jokeState.value
     val jokeCategory = joke.category ?: JokeCategory.Undefined
@@ -71,7 +76,8 @@ fun JokeState(
         jokeText = joke.jokeText,
         isFavorite = joke.isFavorite ?: false,
         jokeCategory = jokeCategory,
-        onFavoriteAction = onFavoriteAction
+        onFavoriteAction = onFavoriteAction,
+        onBackClicked = onBackClicked,
     )
 }
 
@@ -80,26 +86,37 @@ fun JokeBody(
     jokeText: String,
     isFavorite: Boolean,
     jokeCategory: JokeCategory,
-    onFavoriteAction: () -> Unit = {},
+    onFavoriteAction: () -> Unit,
+    onBackClicked: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier.padding(16.dp)
-    ) {
-        QuoteRow()
-        Text(
+    Scaffold(
+        topBar = { HeaderRow(
+            titleStringId = R.string.joke,
+            displayBack = true,
+            onBackClicked = onBackClicked
+        ) }
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .padding(top = 12.dp),
-            text = jokeText,
-            style = TextStyle(
-                fontFamily = roboRegular,
-                fontSize = 30.sp,
+                .padding(innerPadding)
+                .padding(16.dp),
+        ) {
+            QuoteRow()
+            Text(
+                modifier = Modifier
+                    .padding(top = 12.dp),
+                text = jokeText,
+                style = TextStyle(
+                    fontFamily = roboRegular,
+                    fontSize = 30.sp,
+                )
             )
-        )
-        BottomRow(
-            jokeCategory = jokeCategory,
-            isFavorite = isFavorite,
-            onFavoriteAction = onFavoriteAction,
-        )
+            BottomRow(
+                jokeCategory = jokeCategory,
+                isFavorite = isFavorite,
+                onFavoriteAction = onFavoriteAction,
+            )
+        }
     }
 }
 
