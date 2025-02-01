@@ -2,7 +2,7 @@ package com.example.fishbowl_demo.data.model
 
 data class Joke(
     val error: Boolean? = null,
-    val category: String? = null,
+    val category: JokeCategory? = null,
     val type: String? = null,
     val joke: String? = null,
     val setup: String? = null,
@@ -37,7 +37,7 @@ data class Joke(
 
         val example: Joke by lazy {
             Joke(
-                category = "Spooky",
+                category = JokeCategory.Spooky,
                 type = "twopart",
                 setup = "Why do ghosts go on diets?",
                 delivery = "So they can keep their ghoulish figures.",
