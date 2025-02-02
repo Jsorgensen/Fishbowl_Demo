@@ -71,7 +71,7 @@ fun JokeState(
     onBackClicked: () -> Unit,
 ) {
     val joke = jokeState.value
-    val jokeCategory = joke.category ?: JokeCategory.Undefined
+    val jokeCategory = joke.category ?: JokeCategory.Any
     JokeBody(
         jokeText = joke.jokeText,
         isFavorite = joke.isFavorite ?: false,

@@ -1,8 +1,13 @@
 package com.example.fishbowl_demo.data.repositories
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.fishbowl_demo.data.database.JokeEntity
 import com.example.fishbowl_demo.data.database.JokesDatabase
 import com.example.fishbowl_demo.data.model.Joke
+import com.example.fishbowl_demo.data.model.JokeCategory
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -11,6 +16,7 @@ import javax.inject.Inject
 
 class LocalStorageRepository @Inject constructor(
     private val database: JokesDatabase,
+    private val dataStore: DataStore<Preferences>,
     private val gson: Gson,
 ) {
 
@@ -23,6 +29,19 @@ class LocalStorageRepository @Inject constructor(
             }
         }
 
+    private val jokeCategoryKey = stringPreferencesKey("joke_category")
+    val jokeCategoryFLow: Flow<JokeCategory?> = dataStore.data
+        .map { preferences ->
+            JokeCategory.fromName(preferences[jokeCategoryKey])
+                ?: JokeCategory.Any
+        }
+
+
+    suspend fun setJokeCategory(category: JokeCategory) {
+        dataStore.edit { preferences ->
+            preferences[jokeCategoryKey] = category.name
+        }
+    }
 
     suspend fun removeJoke(joke: Joke) {
         val jokeEntity = getEntityByExternalId(joke.id)

@@ -3,14 +3,13 @@ package com.example.fishbowl_demo.data.model
 import com.example.fishbowl_demo.R
 
 enum class JokeCategory {
-    Pun,
-    Spooky,
-    Christmas,
-    Programming,
-    Misc,
     Any,
+    Misc,
+    Programming,
+    Christmas,
+    Pun,
     Dark,
-    Undefined,
+    Spooky,
     ;
 
     val categoryIconId: Int
@@ -22,7 +21,6 @@ enum class JokeCategory {
             Misc -> R.drawable.cards_diamond_outline
             Any -> R.drawable.view_grid_outline
             Dark -> R.drawable.weather_night
-            Undefined -> R.drawable.view_grid_outline
         }
 
     val categoryColorId: Int
@@ -34,6 +32,12 @@ enum class JokeCategory {
             Misc -> R.color.blue_500
             Any -> R.color.indigo_500
             Dark -> R.color.purple_500
-            Undefined -> R.color.black
         }
+
+    companion object {
+
+        fun fromName(name: String?): JokeCategory? {
+            return entries.find { it.name == name }
+        }
+    }
 }

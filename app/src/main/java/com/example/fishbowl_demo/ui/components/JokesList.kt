@@ -15,6 +15,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.example.fishbowl_demo.R
 import com.example.fishbowl_demo.data.model.Joke
+import com.example.fishbowl_demo.data.model.JokeCategory
 import com.example.fishbowl_demo.ui.theme.roboRegular
 
 
@@ -45,7 +46,7 @@ fun JokeItem(
     onSelected: (Joke) -> Unit = {},
     onFavorite: (Joke) -> Unit,
 ) {
-    val jokeCategory = joke.category ?: com.example.fishbowl_demo.data.model.JokeCategory.Undefined
+    val jokeCategory = joke.category ?: JokeCategory.Any
     SwipeRow(
         modifier = Modifier
             .background(colorResource(R.color.red_500)),
