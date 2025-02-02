@@ -36,10 +36,20 @@ class LocalStorageRepository @Inject constructor(
                 ?: JokeCategory.Any
         }
 
+    private val searchTextKey = stringPreferencesKey("search_text")
+    val searchTextFlow: Flow<String> = dataStore.data
+        .map { preferences -> preferences[searchTextKey] ?: "" }
+
 
     suspend fun setJokeCategory(category: JokeCategory) {
         dataStore.edit { preferences ->
             preferences[jokeCategoryKey] = category.name
+        }
+    }
+
+    suspend fun setSearchText(text: String) {
+        dataStore.edit { preferences ->
+            preferences[searchTextKey] = text
         }
     }
 
