@@ -12,6 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.example.fishbowl_demo.R
 import com.example.fishbowl_demo.data.model.Joke
+import com.example.fishbowl_demo.data.model.JokeCategory
+import com.example.fishbowl_demo.ui.components.FilterByCategoryDialog
 import com.example.fishbowl_demo.ui.components.HeaderAction
 import com.example.fishbowl_demo.ui.components.HeaderRow
 import com.example.fishbowl_demo.ui.components.JokesList
@@ -34,7 +36,17 @@ fun JokesScreenPreview() {
         Surface {
             val exampleList = listOf(Joke.example)
             val jokes = flowOf(exampleList).collectAsState(exampleList)
-            JokesBody(jokes, {}, {}, {}, {})
+            JokesBody(
+                jokesState = jokes,
+                displayCategoryFilterDialog = true,
+                selectedCategoryFilter = JokeCategory.Any,
+                onSelected = {},
+                onFavorite = {},
+                onSelectCategory = {},
+                onCategorySelected = {},
+                onNavigateToFavorites = {},
+                onBottomReached = {},
+            )
         }
     }
 }
@@ -44,15 +56,23 @@ fun JokesState(
     viewModel: JokesViewModel
 ) {
     val jokesState = viewModel.jokesFlow.collectAsState(initial = emptyList())
+    val displayCategoryFilterDialog = viewModel.displayCategoryFilterDialog.value
+    val selectedCategoryFilter = viewModel.selectedCategoryFilter.value
     val onSelected: (Joke) -> Unit = { joke: Joke -> viewModel.onJokeSelected(joke) }
     val onFavorite: (Joke) -> Unit = { joke: Joke -> viewModel.onJokeFavoriteSelected(joke) }
+    val onSelectCategory = { viewModel.onSelectCategory() }
+    val onCategorySelected = { category: JokeCategory -> viewModel.onCategorySelected(category) }
     val onNavigateToFavorites = { viewModel.navigateToFavorites() }
     val onBottomReached = { viewModel.requestBatchOfJokes() }
 
     JokesBody(
         jokesState,
+        displayCategoryFilterDialog,
+        selectedCategoryFilter,
         onSelected,
         onFavorite,
+        onSelectCategory,
+        onCategorySelected,
         onNavigateToFavorites,
         onBottomReached,
     )
@@ -61,8 +81,12 @@ fun JokesState(
 @Composable
 fun JokesBody(
     jokesState: State<List<Joke>>,
+    displayCategoryFilterDialog: Boolean,
+    selectedCategoryFilter: JokeCategory?,
     onSelected: (Joke) -> Unit,
     onFavorite: (Joke) -> Unit,
+    onSelectCategory: () -> Unit,
+    onCategorySelected: (JokeCategory) -> Unit,
     onNavigateToFavorites: () -> Unit,
     onBottomReached: () -> Unit,
 ) {
@@ -70,6 +94,10 @@ fun JokesBody(
         topBar = { HeaderRow(
             titleStringId = R.string.jokes,
             actions = {
+                HeaderAction(
+                    iconId = R.drawable.view_grid_outline,
+                    onClick = onSelectCategory
+                )
                 HeaderAction(
                     iconId = R.drawable.heart,
                     onClick = onNavigateToFavorites
@@ -83,6 +111,11 @@ fun JokesBody(
             onSelected = onSelected,
             onFavorite = onFavorite,
             onBottomReached = onBottomReached,
+        )
+        FilterByCategoryDialog(
+            showDialog = displayCategoryFilterDialog,
+            selectedCategory = selectedCategoryFilter,
+            onCategorySelected = onCategorySelected,
         )
     }
 }

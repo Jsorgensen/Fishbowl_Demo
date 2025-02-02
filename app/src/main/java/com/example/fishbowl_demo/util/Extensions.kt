@@ -3,9 +3,10 @@ package com.example.fishbowl_demo.util
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
-val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+val coroutineScope = CoroutineScope(Dispatchers.Default)
 
 fun CoroutineScope.launchIO(block: suspend CoroutineScope.() -> Unit) {
     launch(Dispatchers.IO) {

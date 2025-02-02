@@ -1,6 +1,9 @@
 package com.example.fishbowl_demo.util
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.example.fishbowl_demo.data.database.JokesDatabase
 import com.example.fishbowl_demo.data.network.JokesApi
@@ -16,6 +19,8 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "jokes_preferences")
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -60,6 +65,7 @@ class ProvidersModule {
     ): LocalStorageRepository {
         return LocalStorageRepository(
             database = providesJokesDatabase(context),
+            dataStore = context.dataStore,
             gson = providesGson(),
         )
     }
