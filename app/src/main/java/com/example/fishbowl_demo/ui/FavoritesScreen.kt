@@ -48,7 +48,7 @@ fun FavoritesBody(
 ) {
     Scaffold(
         topBar = { HeaderRow(
-            titleStringId = R.string.jokes,
+            titleStringId = R.string.favorites,
             displayBack = true,
             onBackClicked = onBackClicked,
         ) }

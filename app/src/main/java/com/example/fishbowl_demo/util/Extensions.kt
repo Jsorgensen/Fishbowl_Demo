@@ -6,8 +6,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-val coroutineScope = CoroutineScope(Dispatchers.Default)
-
 fun CoroutineScope.launchIO(block: suspend CoroutineScope.() -> Unit) {
     launch(Dispatchers.IO) {
         block()
@@ -16,6 +14,12 @@ fun CoroutineScope.launchIO(block: suspend CoroutineScope.() -> Unit) {
 
 fun CoroutineScope.launchDefault(block: suspend CoroutineScope.() -> Unit) {
     launch(Dispatchers.Default) {
+        block()
+    }
+}
+
+suspend fun <T> withContextIO(block: suspend CoroutineScope.() -> T): T {
+    return withContext(Dispatchers.IO) {
         block()
     }
 }

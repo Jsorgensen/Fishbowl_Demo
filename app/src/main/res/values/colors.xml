@@ -18,4 +18,6 @@
     <color name="grey_100">#E0E0E0</color>
 
     <color name="unselected_grey">#666666</color>
+
+    <color name="text_field_border">#979797</color>
 </resources>

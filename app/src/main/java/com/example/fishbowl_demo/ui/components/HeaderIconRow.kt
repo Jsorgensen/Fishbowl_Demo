@@ -3,6 +3,7 @@ package com.example.fishbowl_demo.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -32,39 +33,44 @@ fun HeaderRow(
     displayBack: Boolean = false,
     onBackClicked: (() -> Unit)? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
+    content: (@Composable () -> Unit)? = null,
 ) {
     val title = stringResource(titleStringId)
-    Row(
-        modifier = Modifier
-            .background(color = colorResource(R.color.grey_100))
-            .padding(12.dp),
-    ) {
-        if (displayBack) {
+
+    Column {
+        Row(
+            modifier = Modifier
+                .background(color = colorResource(R.color.grey_100))
+                .padding(12.dp),
+        ) {
+            if (displayBack) {
+                Text(
+                    modifier = Modifier
+                        .padding(end = 24.dp)
+                        .align(Alignment.CenterVertically)
+                        .clickable { onBackClicked?.invoke() },
+                    text = "‹",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontFamily = roboRegular,
+                        fontWeight = FontWeight.Bold,
+                    )
+                )
+            }
             Text(
                 modifier = Modifier
-                    .padding(end = 24.dp)
-                    .align(Alignment.CenterVertically)
-                    .clickable { onBackClicked?.invoke() },
-                text = "‹",
+                    .align(Alignment.CenterVertically),
+                text = title,
                 style = TextStyle(
-                    fontSize = 18.sp,
+                    fontSize = 14.sp,
                     fontFamily = roboRegular,
                     fontWeight = FontWeight.Bold,
                 )
             )
+            Spacer(modifier = Modifier.weight(1f))
+            actions?.invoke(this)
         }
-        Text(
-            modifier = Modifier
-                .align(Alignment.CenterVertically),
-            text = title,
-            style = TextStyle(
-                fontSize = 14.sp,
-                fontFamily = roboRegular,
-                fontWeight = FontWeight.Bold,
-            )
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        actions?.invoke(this)
+        content?.invoke()
     }
 }
 

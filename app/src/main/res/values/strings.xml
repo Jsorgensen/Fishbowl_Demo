@@ -3,4 +3,9 @@
 
     <string name="jokes">Jokes</string>
     <string name="joke">Joke</string>
+    <string name="favorites">Favorites</string>
+
+    <string name="search">SEARCH</string>
+
+    <string name="search_jokes">Search Jokes</string>
 </resources>

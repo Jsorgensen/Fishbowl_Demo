@@ -17,6 +17,7 @@ import com.example.fishbowl_demo.ui.components.FilterByCategoryDialog
 import com.example.fishbowl_demo.ui.components.HeaderAction
 import com.example.fishbowl_demo.ui.components.HeaderRow
 import com.example.fishbowl_demo.ui.components.JokesList
+import com.example.fishbowl_demo.ui.components.SearchRow
 import com.example.fishbowl_demo.viewmodel.JokesViewModel
 import kotlinx.coroutines.flow.flowOf
 
@@ -38,12 +39,16 @@ fun JokesScreenPreview() {
             val jokes = flowOf(exampleList).collectAsState(exampleList)
             JokesBody(
                 jokesState = jokes,
-                displayCategoryFilterDialog = true,
+                displayCategoryFilterDialog = false,
                 selectedCategoryFilter = JokeCategory.Any,
+                searchText = "",
                 onSelected = {},
                 onFavorite = {},
                 onSelectCategory = {},
+                onDismissCategoryDialog = {},
                 onCategorySelected = {},
+                onSearchTextChange = {},
+                onSearchClick = {},
                 onNavigateToFavorites = {},
                 onBottomReached = {},
             )
@@ -57,11 +62,15 @@ fun JokesState(
 ) {
     val jokesState = viewModel.jokesFlow.collectAsState(initial = emptyList())
     val displayCategoryFilterDialog = viewModel.displayCategoryFilterDialog.value
-    val selectedCategoryFilter = viewModel.selectedCategoryFilter.value
+    val selectedCategoryFilter = viewModel.selectedCategoryFilter.collectAsState().value
+    val searchText = viewModel.searchText.collectAsState().value
     val onSelected: (Joke) -> Unit = { joke: Joke -> viewModel.onJokeSelected(joke) }
     val onFavorite: (Joke) -> Unit = { joke: Joke -> viewModel.onJokeFavoriteSelected(joke) }
     val onSelectCategory = { viewModel.onSelectCategory() }
+    val onDismissCategoryDialog = { viewModel.onDismissCategoryDialog() }
     val onCategorySelected = { category: JokeCategory -> viewModel.onCategorySelected(category) }
+    val onSearchTextChange = { text: String -> viewModel.onSearchTextChange(text) }
+    val onSearchClick = { viewModel.onSearchClick() }
     val onNavigateToFavorites = { viewModel.navigateToFavorites() }
     val onBottomReached = { viewModel.requestBatchOfJokes() }
 
@@ -69,10 +78,14 @@ fun JokesState(
         jokesState,
         displayCategoryFilterDialog,
         selectedCategoryFilter,
+        searchText,
         onSelected,
         onFavorite,
         onSelectCategory,
+        onDismissCategoryDialog,
         onCategorySelected,
+        onSearchTextChange,
+        onSearchClick,
         onNavigateToFavorites,
         onBottomReached,
     )
@@ -83,27 +96,39 @@ fun JokesBody(
     jokesState: State<List<Joke>>,
     displayCategoryFilterDialog: Boolean,
     selectedCategoryFilter: JokeCategory?,
+    searchText: String,
     onSelected: (Joke) -> Unit,
     onFavorite: (Joke) -> Unit,
     onSelectCategory: () -> Unit,
+    onDismissCategoryDialog: () -> Unit,
     onCategorySelected: (JokeCategory) -> Unit,
+    onSearchTextChange: (String) -> Unit,
+    onSearchClick: () -> Unit,
     onNavigateToFavorites: () -> Unit,
     onBottomReached: () -> Unit,
 ) {
     Scaffold(
-        topBar = { HeaderRow(
-            titleStringId = R.string.jokes,
-            actions = {
-                HeaderAction(
-                    iconId = R.drawable.view_grid_outline,
-                    onClick = onSelectCategory
-                )
-                HeaderAction(
-                    iconId = R.drawable.heart,
-                    onClick = onNavigateToFavorites
+        topBar = {
+            HeaderRow(
+                titleStringId = R.string.jokes,
+                actions = {
+                    HeaderAction(
+                        iconId = R.drawable.view_grid_outline,
+                        onClick = onSelectCategory
+                    )
+                    HeaderAction(
+                        iconId = R.drawable.heart,
+                        onClick = onNavigateToFavorites
+                    )
+                }
+            ) {
+                SearchRow(
+                    searchText = searchText,
+                    onSearchTextChange = onSearchTextChange,
+                    onSearchClick = onSearchClick,
                 )
             }
-        ) }
+        }
     ) { innerPadding ->
         JokesList(
             modifier = Modifier.padding(innerPadding),
@@ -115,6 +140,7 @@ fun JokesBody(
         FilterByCategoryDialog(
             showDialog = displayCategoryFilterDialog,
             selectedCategory = selectedCategoryFilter,
+            onDismiss = onDismissCategoryDialog,
             onCategorySelected = onCategorySelected,
         )
     }
